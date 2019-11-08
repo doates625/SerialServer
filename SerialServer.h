@@ -4,7 +4,6 @@
  * @author Dan Oates (WPI Class of 2020)
  */
 #include <Platform.h>
-using Platform::serial_t;
 
 /**
  * Macro Definition Checks
@@ -36,14 +35,14 @@ using Platform::serial_t;
 class SerialServer
 {
 public:
-	SerialServer(serial_t* serial, uint8_t start_byte = 0x00);
+	SerialServer(Platform::serial_t* serial, uint8_t start_byte = 0x00);
 	void add_tx(uint8_t msg_id, uint8_t data_len, void (*func)(uint8_t*));
 	void add_rx(uint8_t msg_id, uint8_t data_len, void (*func)(uint8_t*));
 	void tx(uint8_t msg_id);
 	void tx();
 	void rx();
 protected:
-	serial_t* serial;
+	Platform::serial_t* serial;
 	uint8_t start_byte;
 	uint8_t num_tx;
 	uint8_t num_rx;

@@ -4,6 +4,7 @@
  */
 #include "SerialServer.h"
 #include <CppUtil.h>
+using Platform::serial_t;
 using CppUtil::find;
 
 /**
