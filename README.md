@@ -25,10 +25,12 @@ Servers have a TX method which calls the corresponding TX packer function then s
 
 #### Macros
 This class requires 4 macros be defined by the pre-processor:
+
 - SERIALSERVER_TX_MAX_IDS: Max number of TX message definitions
 - SERIALSERVER_RX_MAX_IDS: Max number of RX message definitions
 - SERIALSERVER_TX_MAX_LEN: Max data length of TX message
 - SERIALSERVER_RX_MAX_LEN: Max data length of RX message
+
 Each of these macros must be defined as an integer greater than 0.
 
 ### Dependencies
