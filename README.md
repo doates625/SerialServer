@@ -21,7 +21,7 @@ A serial message consists of the following:
 - Data (N bytes)
 - Checksum (1 byte)
 
-Servers have a TX method which calls the corresponding TX packer function then sends the packet. There is also a TX method with no arguments which transmits one message for all TX message definitions. The RX method parses the entire incoming serial buffer for messages and calls the corresponding RX unpacker functions for messages with valid start bytes, message IDs, and checksums.
+Servers have a TX method which calls the corresponding TX packer function then sends the packet. There is also a TX method with no arguments which transmits one message for all TX message definitions. The RX method parses the entire incoming serial buffer for messages and calls the corresponding RX unpacker functions for messages with valid start bytes, message IDs, and checksums. Messages with invalid checksums or bytes not received within a timeout are ignored.
 
 #### Macros
 This class requires 4 macros be defined by the pre-processor:
@@ -35,3 +35,4 @@ Each of these macros must be defined as an integer greater than 0.
 
 ### Dependencies
 - [Platform](https://github.com/doates625/Platform.git)
+- [Timer](https://github.com/doates625/Timer.git)

@@ -4,6 +4,7 @@
  */
 #include "SerialServer.h"
 #include <CppUtil.h>
+#include <Timer.h>
 using Platform::serial_t;
 using CppUtil::find;
 
@@ -11,13 +12,15 @@ using CppUtil::find;
  * @brief Constructor for Serial Server
  * @param serial Pointer to serial port interface
  * @param start_byte Message start byte
+ * @param timeout Inter-byte read timeout [s]
  */
-SerialServer::SerialServer(serial_t* serial, uint8_t start_byte)
+SerialServer::SerialServer(serial_t* serial, uint8_t start_byte, float timeout)
 {
 	this->serial = serial;
 	this->start_byte = start_byte;
 	this->num_tx = 0;
 	this->num_rx = 0;
+	this->timeout = timeout;
 }
 
 /**
@@ -90,6 +93,11 @@ void SerialServer::rx()
 		if (serial->read() == start_byte)
 		{
 			// Find message by ID
+			if (!wait())
+			{
+				flush();
+				return;
+			}
 			uint8_t msg_id = serial->read();
 			bool found_id = false;
 			uint8_t rx_i = find(rx_ids, msg_id, num_rx, found_id);
@@ -99,12 +107,22 @@ void SerialServer::rx()
 				uint8_t checksum = 0x00;
 				for (uint8_t d = 0; d < rx_data_lens[rx_i]; d++)
 				{
+					if (!wait())
+					{
+						flush();
+						return;
+					}
 					uint8_t byte = serial->read();
 					rx_data[d] = byte;
 					checksum += byte;
 				}
 
 				// Process packet if checksum is correct
+				if (!wait())
+				{
+					flush();
+					return;
+				}
 				if (serial->read() == checksum)
 				{
 					rx_funcs[rx_i](rx_data);
@@ -148,6 +166,24 @@ void SerialServer::tx_index(uint8_t tx_i)
 
 	// Write checksum
 	serial->write(checksum);
+}
+
+/**
+ * @brief Waits for byte in input buffer
+ * @return True if received within timeout, false otherwise
+ */
+bool SerialServer::wait()
+{
+	Timer timer;
+	timer.start();
+	while (!serial->available())
+	{
+		if (timer.read_ms() > 100)
+		{
+			return false;
+		}
+	}
+	return true;
 }
 
 /**
